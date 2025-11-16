@@ -29,8 +29,11 @@ func headers(r *http.Request) (RapidApiHeaders, error) {
 	host := r.Header.Get("X-RapidAPI-host")
 	forwardedFor := r.Header.Get("X-Forwarded-For")
 	forwardedHost := r.Header.Get("X-Forwarded-Host")
+	if secret == "" {
+		return RapidApiHeaders{}, fmt.Errorf("rapidapi secret is missing")
+	}
 	if secret != os.Getenv("RAPIDAPI_SECRET") {
-		return RapidApiHeaders{}, fmt.Errorf("rapidapi key is missing")
+		return RapidApiHeaders{}, fmt.Errorf("wrong rapidapi secret")
 	}
 	return RapidApiHeaders{
 		ProxySecret: secret,
@@ -65,6 +68,9 @@ func main() {
 		}
 		json.NewEncoder(w).Encode(resp)
 	})
-
+	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+	fmt.Println("Running in the 8080 port")
 	http.ListenAndServe(":8080", nil)
 }
