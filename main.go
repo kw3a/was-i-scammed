@@ -42,12 +42,13 @@ func headers(r *http.Request) (RapidApiHeaders, error) {
 		ForwardedHost: forwardedHost,
 	}, nil
 }
+
 func main() {
 	if os.Getenv("RAPIDAPI_SECRET") == "" {
 		println("RAPIDAPI SECRET is not set")
 		os.Exit(0)
 	}
-	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		rapidapiH, err := headers(r)
 		if err != nil {
